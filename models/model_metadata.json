@@ -1,0 +1,56 @@
+{
+  "project": "SydValuat_AI",
+  "model_family": "Gradient Boosting",
+  "trained_on_records": 100,
+  "features_numeric": [
+    "bedrooms",
+    "bathrooms",
+    "car_spaces",
+    "log_effective_land",
+    "local_centre_km",
+    "distance_to_school_km",
+    "sale_month"
+  ],
+  "features_categorical": [
+    "suburb",
+    "ptype_group"
+  ],
+  "category_levels": {
+    "suburb": [
+      "Blacktown",
+      "Marrickville",
+      "Mosman"
+    ],
+    "ptype_group": [
+      "House",
+      "Townhouse/Duplex",
+      "Unit"
+    ]
+  },
+  "land_medians_by_type": {
+    "Duplex": 242.0,
+    "House": 534.5,
+    "Townhouse": 221.5,
+    "Unit": 774.0
+  },
+  "engineering_recipe": {
+    "effective_land_m2": "land_size_m2 (median-imputed by type) for House/Townhouse/Duplex, else 0",
+    "log_effective_land": "log1p(effective_land_m2)",
+    "sale_month": "month number of valuation date",
+    "ptype_group": "Townhouse and Duplex grouped as 'Townhouse/Duplex'",
+    "local_centre_km": "distance to local suburb hub (NOT the Sydney CBD - see Section 2.7)"
+  },
+  "target_transform": "log / exp via TransformedTargetRegressor",
+  "holdout_metrics": {
+    "R2": 0.6526,
+    "RMSE": 879435.5921,
+    "MAE": 485336.799,
+    "MAPE": 21.3479
+  },
+  "cv_rmse_dollars": 883740.46,
+  "conformal_90_multiplier": 1.7747,
+  "random_state": 42,
+  "sklearn_version": "1.6.1",
+  "trained_at": "2026-08-01T15:05:58",
+  "data_source": "https://raw.githubusercontent.com/ayubsmg16/SydValuat_AI/main/data/raw/Property_Sales_Dataset.csv"
+}
