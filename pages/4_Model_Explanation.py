@@ -3,13 +3,13 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+from src.branding import apply as apply_branding, style_fig, TEAL, TEAL_LT, GOLD
 from src.sydvaluat import load_artifacts, dollars
 
 st.set_page_config(page_title="Model Explanation — SydValuat_AI",
                    page_icon="🏠", layout="wide")
-st.title("How the model works")
-
 model, meta = load_artifacts()
+apply_branding("explain", title="How the model works")
 
 st.markdown(
     f"""
@@ -47,12 +47,14 @@ try:
         imp = imp.sort_values().tail(10)
         clean = (imp.rename(index=lambda s: s.replace("num__", "").replace("cat__", "")
                             .replace("_", " ")))
+        colors = [GOLD if i == len(clean) - 1 else (TEAL_LT if i >= len(clean) - 3 else TEAL)
+                  for i in range(len(clean))]
         fig, ax = plt.subplots(figsize=(8, 4))
-        clean.plot.barh(ax=ax, color="#14535B")
+        clean.plot.barh(ax=ax, color=colors)
         ax.set_xlabel(label)
         for s in ["top", "right"]:
             ax.spines[s].set_visible(False)
-        st.pyplot(fig, use_container_width=True)
+        st.pyplot(style_fig(fig), use_container_width=True)
         st.caption(
             "Location dominates: knowing the suburb moves an estimate more than any other "
             "single fact. Within a suburb, size (bedrooms, bathrooms, effective land) and "

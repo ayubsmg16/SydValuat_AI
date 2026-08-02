@@ -1,11 +1,11 @@
 import streamlit as st
 
+from src.branding import apply as apply_branding
 from src.sydvaluat import load_artifacts
 
 st.set_page_config(page_title="About — SydValuat_AI", page_icon="🏠", layout="wide")
-st.title("About SydValuat_AI")
-
 model, meta = load_artifacts()
+apply_branding("about", title="About SydValuat_AI")
 
 st.markdown(
     f"""

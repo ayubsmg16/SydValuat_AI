@@ -1,14 +1,14 @@
 import pandas as pd
 import streamlit as st
 
+from src.branding import apply as apply_branding
 from src.sydvaluat import (load_artifacts, engineer_features, predict_with_band,
                            validate_batch, batch_template, INPUT_COLUMNS)
 
 st.set_page_config(page_title="Batch CSV Prediction — SydValuat_AI",
                    page_icon="🏠", layout="wide")
-st.title("Batch CSV prediction")
-
 model, meta = load_artifacts()
+apply_branding("batch", title="Batch CSV prediction")
 
 st.markdown(
     f"Upload a CSV with one row per property and these columns: "

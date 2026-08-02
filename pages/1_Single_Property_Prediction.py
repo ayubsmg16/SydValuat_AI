@@ -3,14 +3,15 @@ import numpy as np
 import pandas as pd
 import streamlit as st
 
+from src.branding import apply as apply_branding, style_fig, TEAL, GOLD, NAVY_3, TEAL_PALE
 from src.sydvaluat import (load_artifacts, load_dataset, engineer_features,
                            predict_with_band, dollars)
 
 st.set_page_config(page_title="Single Property Prediction — SydValuat_AI",
                    page_icon="🏠", layout="wide")
-st.title("Single property prediction")
-
 model, meta = load_artifacts()
+apply_branding("predict", title="Single property prediction")
+
 suburbs = meta["category_levels"]["suburb"]
 
 with st.form("property_form"):
@@ -52,19 +53,18 @@ if submitted:
         f"{dollars(meta['holdout_metrics']['RMSE'])}."
     )
 
-    # Context: where this estimate sits within the suburb's recorded sales
     df = load_dataset()
     sub = df[df["suburb"] == suburb]
     fig, ax = plt.subplots(figsize=(8, 2.8))
-    ax.hist(sub["sale_price"] / 1e6, bins=15, color="#9fc2c9", edgecolor="white")
-    ax.axvline(p / 1e6, color="#14535B", lw=2)
-    ax.axvspan(l / 1e6, h / 1e6, color="#14535B", alpha=0.12)
+    ax.hist(sub["sale_price"] / 1e6, bins=15, color=NAVY_3, edgecolor=TEAL_PALE)
+    ax.axvline(p / 1e6, color=GOLD, lw=2.5)
+    ax.axvspan(l / 1e6, h / 1e6, color=TEAL, alpha=0.25)
     ax.set_xlabel("Sale price ($ million)")
     ax.set_yticks([])
     ax.set_title(f"Your estimate against {len(sub)} recorded {suburb} sales", fontsize=11)
     for s in ["top", "right", "left"]:
         ax.spines[s].set_visible(False)
-    st.pyplot(fig, use_container_width=True)
+    st.pyplot(style_fig(fig), use_container_width=True)
 
     if ptype == "Unit" and land > 0:
         st.info("Note: for units, any land figure on a listing usually describes the whole "
