@@ -1,12 +1,12 @@
 import streamlit as st
 
+from src.branding import apply as apply_branding
 from src.sydvaluat import load_artifacts, load_dataset, dollars, sklearn_version_mismatch
 
 st.set_page_config(page_title="SydValuat_AI", page_icon="🏠", layout="wide")
 
 model, meta = load_artifacts()
-
-st.title("SydValuat_AI")
+apply_branding("home", title="SydValuat_AI")
 st.subheader("Sydney housing price prediction and market intelligence")
 
 mismatch = sklearn_version_mismatch(meta)
