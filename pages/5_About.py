@@ -9,7 +9,7 @@ apply_branding("about", title="About SydValuat_AI")
 
 st.markdown(
     f"""
-**SydValuat_AI** is the deployment deliverable of the SIG720/SIT720 Machine Learning mini
+**SydValuat_AI** is the deployment deliverable of the SIG720 Machine Learning mini
 project at Deakin University: *Sydney Housing Price Prediction and Decision Support System*.
 
 **Author.** Ayuba Sule (Student ID 226653319), MSc Data Science, School of Information
