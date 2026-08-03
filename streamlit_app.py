@@ -50,7 +50,7 @@ st.markdown(
 )
 
 st.info(
-    "**Appropriate use.** This is an academic decision-support prototype for SIG720/SIT720 at "
+    "**Appropriate use.** This is an academic decision-support prototype for SIG720 at "
     "Deakin University. It interpolates within three suburbs and observable listing features "
     "only; it is not a professional valuation and must not be used to set prices."
 )
