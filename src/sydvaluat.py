@@ -146,3 +146,14 @@ def load_dataset():
 
 def dollars(v):
     return f"${v:,.0f}"
+
+def dollars_md(v):
+    """Markdown-safe dollar formatting for st.caption / st.markdown.
+
+    Streamlit renders Markdown, where a PAIR of $ signs delimits LaTeX math,
+    so unescaped amounts like "$885,000 ... $1,610,000" turn the text between
+    them into a styled math span. A backslash before each dollar sign makes it
+    render as a literal character.
+    Use dollars() for st.metric (no Markdown there); dollars_md() for captions.
+    """
+    return f"\\${v:,.0f}"
