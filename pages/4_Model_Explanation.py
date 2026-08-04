@@ -4,7 +4,7 @@ import pandas as pd
 import streamlit as st
 
 from src.branding import apply as apply_branding, style_fig, TEAL, TEAL_LT, GOLD
-from src.sydvaluat import load_artifacts, dollars
+from src.sydvaluat import load_artifacts, dollars, dollars_md
 
 st.set_page_config(page_title="Model Explanation — SydValuat_AI",
                    page_icon="🏠", layout="wide")
@@ -28,7 +28,7 @@ c1.metric("R²", f"{hm['R2']:.2f}")
 c2.metric("RMSE", dollars(hm["RMSE"]))
 c3.metric("MAE", dollars(hm["MAE"]))
 c4.metric("MAPE", f"{hm['MAPE']:.1f}%")
-st.caption(f"Cross-validated RMSE during model selection: {dollars(meta['cv_rmse_dollars'])}.")
+st.caption(f"Cross-validated RMSE during model selection: {dollars_md(meta['cv_rmse_dollars'])}.")
 
 st.markdown("#### What drives an estimate")
 try:

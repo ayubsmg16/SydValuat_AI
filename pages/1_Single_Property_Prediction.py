@@ -5,7 +5,7 @@ import streamlit as st
 
 from src.branding import apply as apply_branding, style_fig, TEAL, GOLD, NAVY_3, TEAL_PALE
 from src.sydvaluat import (load_artifacts, load_dataset, engineer_features,
-                           predict_with_band, dollars)
+                           predict_with_band, dollars, dollars_md)
 
 st.set_page_config(page_title="Single Property Prediction — SydValuat_AI",
                    page_icon="🏠", layout="wide")
@@ -48,9 +48,9 @@ if submitted:
     m3.metric("Upper bound (90% band)", dollars(h))
     st.caption(
         f"The band means: for properties like this, the model's historical errors imply the "
-        f"actual sale price falls between {dollars(l)} and {dollars(h)} roughly 9 times in 10. "
+        f"actual sale price falls between {dollars_md(l)} and {dollars_md(h)} roughly 9 times in 10. "
         f"Hold-out MAPE is {meta['holdout_metrics']['MAPE']:.1f}%, RMSE "
-        f"{dollars(meta['holdout_metrics']['RMSE'])}."
+        f"{dollars_md(meta['holdout_metrics']['RMSE'])}."
     )
 
     df = load_dataset()

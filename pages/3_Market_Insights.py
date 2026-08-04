@@ -4,7 +4,7 @@ import streamlit as st
 
 from src.branding import (apply as apply_branding, style_fig, SUBURB_COLORS,
                           NAVY_3, TEAL_PALE)
-from src.sydvaluat import load_dataset, dollars
+from src.sydvaluat import load_dataset, dollars, dollars_md
 
 st.set_page_config(page_title="Market Insights — SydValuat_AI",
                    page_icon="🏠", layout="wide")
@@ -40,7 +40,7 @@ with tab1:
     med = df.groupby("suburb")["sale_price"].median()
     st.caption(
         f"Three genuinely different markets: median prices run from "
-        f"{dollars(med[order[0]])} ({order[0]}) to {dollars(med[order[-1]])} ({order[-1]}), "
+        f"{dollars_md(med[order[0]])} ({order[0]}) to {dollars_md(med[order[-1]])} ({order[-1]}), "
         f"a {med[order[-1]]/med[order[0]]:.1f}× gap — which is why suburb is the model's "
         "single most influential feature."
     )
