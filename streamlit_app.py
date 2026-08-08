@@ -30,13 +30,19 @@ model's own out-of-fold errors. An estimate without that band would overstate wh
 )
 
 df = load_dataset()
-st.markdown("#### Market snapshot (from the project dataset)")
+st.markdown("#### Market snapshot (all recorded sales)")
 cols = st.columns(3)
 for col, suburb in zip(cols, ["Blacktown", "Marrickville", "Mosman"]):
     sub = df[df["suburb"] == suburb]
     col.metric(label=f"{suburb} — median sale price",
                value=dollars(sub["sale_price"].median()),
                delta=f"{len(sub)} recorded sales", delta_color="off")
+st.caption(
+    f"Medians above are computed across all {len(df)} collected sales. The project "
+    "notebook reports slightly different medians because its exploratory analysis is "
+    "restricted to the 80-record training partition — the hold-out set is never "
+    "inspected before evaluation."
+)
 
 st.markdown("#### Using this app")
 st.markdown(
