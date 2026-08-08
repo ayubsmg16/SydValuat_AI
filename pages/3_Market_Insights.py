@@ -4,7 +4,7 @@ import streamlit as st
 
 from src.branding import (apply as apply_branding, style_fig, SUBURB_COLORS,
                           NAVY_3, TEAL_PALE)
-from src.sydvaluat import load_dataset, dollars, dollars_md
+from src.sydvaluat import load_dataset, dollars
 
 st.set_page_config(page_title="Market Insights — SydValuat_AI",
                    page_icon="🏠", layout="wide")
@@ -23,6 +23,12 @@ c1.metric("Recorded sales", len(df))
 c2.metric("Median price (all)", dollars(df["sale_price"].median()))
 c3.metric("Cheapest sale", dollars(df["sale_price"].min()))
 c4.metric("Dearest sale", dollars(df["sale_price"].max()))
+st.caption(
+    f"Every figure on this page is computed across all {len(df)} collected sales. The "
+    "project notebook quotes slightly different suburb medians because its exploratory "
+    "analysis is restricted to the 80-record training partition — the 20 hold-out "
+    "properties are never inspected before the model is evaluated."
+)
 
 order = df.groupby("suburb")["sale_price"].median().sort_values().index.tolist()
 
@@ -38,11 +44,16 @@ with tab1:
     ax.yaxis.set_major_formatter(lambda v, _: f"${v/1e6:.1f}m")
     st.pyplot(style_fig(fig), use_container_width=True)
     med = df.groupby("suburb")["sale_price"].median()
+    iqr = df.groupby("suburb")["sale_price"].quantile(.75) - \
+        df.groupby("suburb")["sale_price"].quantile(.25)
+    widest = iqr.idxmax()
     st.caption(
-        f"Three genuinely different markets: median prices run from "
-        f"{dollars_md(med[order[0]])} ({order[0]}) to {dollars_md(med[order[-1]])} ({order[-1]}), "
-        f"a {med[order[-1]]/med[order[0]]:.1f}× gap — which is why suburb is the model's "
-        "single most influential feature."
+        f"Three genuinely different markets, though the difference is not mainly in the "
+        f"median: those run from {dollars(med[order[0]])} ({order[0]}) to "
+        f"{dollars(med[order[-1]])} ({order[-1]}), a {med[order[-1]]/med[order[0]]:.1f}× gap. "
+        f"The sharper contrast is spread — {widest}'s interquartile range of "
+        f"{dollars(iqr[widest])} is {iqr[widest]/iqr.drop(widest).max():.1f}× the next "
+        "widest, which is why its properties are the hardest for the model to price."
     )
 
 with tab2:

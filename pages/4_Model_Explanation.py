@@ -1,10 +1,8 @@
 import matplotlib.pyplot as plt
-import numpy as np
-import pandas as pd
 import streamlit as st
 
 from src.branding import apply as apply_branding, style_fig, TEAL, TEAL_LT, GOLD
-from src.sydvaluat import load_artifacts, dollars, dollars_md
+from src.sydvaluat import load_artifacts, dollars, feature_importances
 
 st.set_page_config(page_title="Model Explanation — SydValuat_AI",
                    page_icon="🏠", layout="wide")
@@ -28,37 +26,32 @@ c1.metric("R²", f"{hm['R2']:.2f}")
 c2.metric("RMSE", dollars(hm["RMSE"]))
 c3.metric("MAE", dollars(hm["MAE"]))
 c4.metric("MAPE", f"{hm['MAPE']:.1f}%")
-st.caption(f"Cross-validated RMSE during model selection: {dollars_md(meta['cv_rmse_dollars'])}.")
+st.caption(f"Cross-validated RMSE during model selection: {dollars(meta['cv_rmse_dollars'])}.")
 
 st.markdown("#### What drives an estimate")
 try:
-    inner = model.regressor_.named_steps["model"]
-    prep = model.regressor_.named_steps["prep"]
-    names = prep.get_feature_names_out()
-    if hasattr(inner, "feature_importances_"):
-        imp = pd.Series(inner.feature_importances_, index=names)
-        label = "Share of the model's decisions"
-    elif hasattr(inner, "coef_"):
-        imp = pd.Series(np.abs(inner.coef_), index=names)
-        label = "Absolute standardised coefficient"
+    imp, label = feature_importances(model, meta)
+    if imp.empty:
+        st.info("Feature-importance display is unavailable for this artifact.")
     else:
-        imp = None
-    if imp is not None:
-        imp = imp.sort_values().tail(10)
-        clean = (imp.rename(index=lambda s: s.replace("num__", "").replace("cat__", "")
-                            .replace("_", " ")))
-        colors = [GOLD if i == len(clean) - 1 else (TEAL_LT if i >= len(clean) - 3 else TEAL)
-                  for i in range(len(clean))]
+        top = imp.head(10).iloc[::-1]
+        pretty = top["feature"].str.replace("_", " ")
+        colors = [GOLD if i == len(top) - 1 else (TEAL_LT if i >= len(top) - 3 else TEAL)
+                  for i in range(len(top))]
         fig, ax = plt.subplots(figsize=(8, 4))
-        clean.plot.barh(ax=ax, color=colors)
+        ax.barh(pretty, top["importance"], color=colors)
         ax.set_xlabel(label)
         for s in ["top", "right"]:
             ax.spines[s].set_visible(False)
         st.pyplot(style_fig(fig), use_container_width=True)
+
+        leader = imp.iloc[0]["feature"].replace("_", " ")
         st.caption(
-            "Location dominates: knowing the suburb moves an estimate more than any other "
-            "single fact. Within a suburb, size (bedrooms, bathrooms, effective land) and "
-            "position do the remaining work."
+            f"Measured on the training partition, **{leader}** dominates: knowing it moves "
+            "an estimate more than any other single fact, and the one-hot levels of a "
+            "categorical feature are summed so location appears as one bar rather than "
+            "several. Within a suburb, size and position do the remaining work. These are "
+            "the same figures reported in Section 11 of the project notebook."
         )
 except Exception as e:
     st.info(f"Feature-importance display unavailable for this artifact ({e}).")
@@ -69,7 +62,8 @@ st.markdown(
 The band shown with every prediction is **not decoration**. It comes from a conformal-style
 procedure: the model's own out-of-fold errors on the training data define a 90% quantile, and
 that quantile becomes a multiplicative band of **×/÷ {meta['conformal_90_multiplier']:.2f}**
-around any new estimate. On the hold-out set this band achieved its intended coverage.
+around any new estimate. On the hold-out set it covered all 20 sales — above its nominal 90%,
+though with only 20 properties that estimate carries roughly ±13 percentage points of noise.
 
 The band is wide because the honest uncertainty *is* wide: with
 {meta['trained_on_records']} observations and only listing-visible features, the model cannot
