@@ -4,7 +4,7 @@ import streamlit as st
 
 from src.branding import (apply as apply_branding, style_fig, SUBURB_COLORS,
                           NAVY_3, TEAL_PALE)
-from src.sydvaluat import load_dataset, dollars
+from src.sydvaluat import load_dataset, dollars, dollars_md
 
 st.set_page_config(page_title="Market Insights — SydValuat_AI",
                    page_icon="🏠", layout="wide")
@@ -49,10 +49,10 @@ with tab1:
     widest = iqr.idxmax()
     st.caption(
         f"Three genuinely different markets, though the difference is not mainly in the "
-        f"median: those run from {dollars(med[order[0]])} ({order[0]}) to "
-        f"{dollars(med[order[-1]])} ({order[-1]}), a {med[order[-1]]/med[order[0]]:.1f}× gap. "
+        f"median: those run from {dollars_md(med[order[0]])} ({order[0]}) to "
+        f"{dollars_md(med[order[-1]])} ({order[-1]}), a {med[order[-1]]/med[order[0]]:.1f}× gap. "
         f"The sharper contrast is spread — {widest}'s interquartile range of "
-        f"{dollars(iqr[widest])} is {iqr[widest]/iqr.drop(widest).max():.1f}× the next "
+        f"{dollars_md(iqr[widest])} is {iqr[widest]/iqr.drop(widest).max():.1f}× the next "
         "widest, which is why its properties are the hardest for the model to price."
     )
 

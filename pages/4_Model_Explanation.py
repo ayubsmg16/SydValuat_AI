@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import streamlit as st
 
 from src.branding import apply as apply_branding, style_fig, TEAL, TEAL_LT, GOLD
-from src.sydvaluat import load_artifacts, dollars, feature_importances
+from src.sydvaluat import load_artifacts, dollars, dollars_md, feature_importances
 
 st.set_page_config(page_title="Model Explanation — SydValuat_AI",
                    page_icon="🏠", layout="wide")
@@ -26,7 +26,8 @@ c1.metric("R²", f"{hm['R2']:.2f}")
 c2.metric("RMSE", dollars(hm["RMSE"]))
 c3.metric("MAE", dollars(hm["MAE"]))
 c4.metric("MAPE", f"{hm['MAPE']:.1f}%")
-st.caption(f"Cross-validated RMSE during model selection: {dollars(meta['cv_rmse_dollars'])}.")
+st.caption("Cross-validated RMSE during model selection: "
+           f"{dollars_md(meta['cv_rmse_dollars'])}.")
 
 st.markdown("#### What drives an estimate")
 try:
@@ -46,12 +47,15 @@ try:
         st.pyplot(style_fig(fig), use_container_width=True)
 
         leader = imp.iloc[0]["feature"].replace("_", " ")
+        basis = meta.get("permutation_importance_basis")
+        provenance = (f"Basis: {basis}." if basis else
+                      "Basis: the estimator's own gain-based importances — the notebook's "
+                      "permutation figures are not present in this model_metadata.json.")
         st.caption(
-            f"Measured on the training partition, **{leader}** dominates: knowing it moves "
-            "an estimate more than any other single fact, and the one-hot levels of a "
-            "categorical feature are summed so location appears as one bar rather than "
-            "several. Within a suburb, size and position do the remaining work. These are "
-            "the same figures reported in Section 11 of the project notebook."
+            f"**{leader}** dominates: knowing it moves an estimate more than any other "
+            "single fact, and the one-hot levels of a categorical feature are summed so "
+            "location appears as one bar rather than several. Within a suburb, size and "
+            f"position do the remaining work. {provenance}"
         )
 except Exception as e:
     st.info(f"Feature-importance display unavailable for this artifact ({e}).")
