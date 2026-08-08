@@ -97,6 +97,46 @@ def predict_with_band(model, meta, X):
     return point, point / band, point * band
 
 
+def feature_importances(model, meta):
+    """Feature importances for the Model Explanation page.
+
+    Prefers the permutation importances exported by the notebook, so the app,
+    the notebook and the report all quote the same numbers under the same
+    metric. Falls back to the estimator's built-in (gain-based) importances
+    with one-hot columns summed back to their source feature, which keeps
+    `suburb` a single row rather than one row per level.
+
+    Returns (DataFrame[feature, importance], metric_label).
+    """
+    exported = meta.get("permutation_importance")
+    if exported:
+        s = pd.Series(exported, dtype="float64").sort_values(ascending=False)
+        return (s.rename_axis("feature").reset_index(name="importance"),
+                "Permutation importance (drop in R² when the feature is shuffled)")
+
+    inner = getattr(model, "regressor_", model)
+    estimator = inner.named_steps["model"]
+    raw = getattr(estimator, "feature_importances_", None)
+    label = "Gain-based importance, one-hot levels summed per feature"
+    if raw is None:
+        coef = getattr(estimator, "coef_", None)
+        if coef is None:
+            return pd.DataFrame(columns=["feature", "importance"]), "Importance unavailable"
+        raw = np.abs(np.ravel(coef))
+        label = "Absolute standardised coefficient, one-hot levels summed"
+
+    names = list(inner.named_steps["prep"].get_feature_names_out())
+    sources = meta["features_numeric"] + meta["features_categorical"]
+    grouped = {}
+    for name, value in zip(names, raw):
+        bare = name.split("__", 1)[-1]
+        owner = next((s for s in sorted(sources, key=len, reverse=True)
+                      if bare == s or bare.startswith(s + "_")), bare)
+        grouped[owner] = grouped.get(owner, 0.0) + float(value)
+    s = pd.Series(grouped).sort_values(ascending=False)
+    return s.rename_axis("feature").reset_index(name="importance"), label
+
+
 def validate_batch(df):
     """Check an uploaded CSV for the required raw columns; return list of problems."""
     problems = []
@@ -146,14 +186,3 @@ def load_dataset():
 
 def dollars(v):
     return f"${v:,.0f}"
-
-def dollars_md(v):
-    """Markdown-safe dollar formatting for st.caption / st.markdown.
-
-    Streamlit renders Markdown, where a PAIR of $ signs delimits LaTeX math,
-    so unescaped amounts like "$885,000 ... $1,610,000" turn the text between
-    them into a styled math span. A backslash before each dollar sign makes it
-    render as a literal character.
-    Use dollars() for st.metric (no Markdown there); dollars_md() for captions.
-    """
-    return f"\\${v:,.0f}"
