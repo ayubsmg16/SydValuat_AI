@@ -186,3 +186,14 @@ def load_dataset():
 
 def dollars(v):
     return f"${v:,.0f}"
+
+
+def dollars_md(v):
+    """Dollar figure safe for markdown contexts.
+
+    Streamlit renders text between paired `$` as LaTeX, so a caption containing
+    two dollar amounts silently turns into maths. Escaping the sign prevents it.
+    Use this inside st.markdown / st.caption; plain dollars() is fine in
+    st.metric, which does not parse markdown.
+    """
+    return dollars(v).replace("$", r"\$")
