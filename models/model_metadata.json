@@ -47,10 +47,22 @@
     "MAE": 485336.799,
     "MAPE": 21.3479
   },
+  "permutation_importance": {
+    "suburb": 0.5049,
+    "bathrooms": 0.3353,
+    "bedrooms": 0.1807,
+    "log_effective_land": 0.0706,
+    "car_spaces": 0.0623,
+    "local_centre_km": 0.0607,
+    "sale_month": 0.047,
+    "distance_to_school_km": 0.0459,
+    "ptype_group": 0.0084
+  },
+  "permutation_importance_basis": "training partition, 30 repeats, scoring=r2 - see Section 11",
   "cv_rmse_dollars": 883740.46,
   "conformal_90_multiplier": 1.7747,
   "random_state": 42,
   "sklearn_version": "1.6.1",
-  "trained_at": "2026-08-01T15:05:58",
+  "trained_at": "2026-08-08T14:40:32",
   "data_source": "https://raw.githubusercontent.com/ayubsmg16/SydValuat_AI/main/data/raw/Property_Sales_Dataset.csv"
 }
